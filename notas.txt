@@ -1,0 +1,40 @@
+O que é RAG:
+
+Basicamente, fornecer contextos "privados" para uma LLM. Meus dados, meu contexto para a LLM. Uma LLM é treinada até certo ponto. Depois disso,
+ela pode não conhecer, por exemplo, o contexto de uma empresa, de um projeto, etc.
+
+Casos de uso:
+
+-assistentes
+-FAQ dinâmico
+-contextos privados de uma instituição
+
+1)Preparação: os documentos são divididos em pedaços (chunks). Uma LLM vai ser usada para transformar os chunks em uma sequencia de números,
+processo conhecido como embedding. Basicamente é uma representação vetorial daquele conteúdo, que vai ser guardado em um banco de dados apropriado
+(banco de dados vetorial).
+
+2)Busca/geração: 
+
+-a pergunta feita pelo usuário é convertida também em números (embedding).
+-o sistem compara o embedding da pergunta com o que existe no banco de dados vetorial, encontrando o que é mais parecido.
+-o sistema retorna os documentos e a pergunta feita.
+-a IA monta a resposta com base nesse contexto retornado.
+
+Vantagens
+
+-a IA para de adivinhar e vai buscar respostas em uma fonte de verdade
+-aumenta a transparência, pois eu defino qual será a fonte de verdade
+-permite acesso a dados mais recentes, uma vez que são mais controláveis
+
+
+Ferramentas que serão usadas:
+
+1)LangChain é um framework de código aberto que facilita o desenvolvimento de aplicações utilizando Grandes Modelos de Linguagem (LLMs), 
+como o GPT da OpenAI. Ele atua como uma "cola" ou orquestrador, permitindo integrar inteligência artificial a fontes de dados externas 
+e ferramentas de software.
+
+2)Qdrant: banco de dados vetorial
+
+3)OpenAI: plataforma de LLMs para acesso por meio de uma conta
+
+*Se for usar o qdrant, ele possui uma página de dashboard: http://localhost:6333/dashboard
