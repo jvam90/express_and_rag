@@ -38,3 +38,73 @@ e ferramentas de software.
 3)OpenAI: plataforma de LLMs para acesso por meio de uma conta
 
 *Se for usar o qdrant, ele possui uma página de dashboard: http://localhost:6333/dashboard
+
+===
+
+Configurando o qdrant
+
+Qdrant é o banco de dados vetorial que será utilizado no projeto. Como ele se trata de uma API, é preciso de uma URL na sua instanciação:
+
+export const qdrantClient = new QdrantClient({
+  url: config.qdrant.url, //url no arquivo de config
+});
+
+O próximo passo é criar a collection que guardará os dados:
+
+//Criar uma coleção no qdrant ao inicializar a API, se ela não existir
+export async function initQdrantCollection() {
+  const collections = await qdrantClient.getCollections();
+  const collectionName = config.qdrant.collection;
+  const exists = collections.collections.find((col) => {
+    col.name === collectionName;
+  });
+
+  if (!exists) {
+    await qdrantClient.createCollection(collectionName, {
+      vectors: {
+        size: 1536,
+        distance: "Cosine",
+      },
+    });
+
+    console.log(`${collectionName} criada no qdrant`);
+  } else {
+    console.log(`${collectionName} já existente no qdrant`);
+  }
+}
+
+Primeiro se busca pela collection. Se não existir, ela deve ser criada, passando seu nome e alguns parâmetros:
+
+vectors: objeto que tem o tamanho e a distância. Tamanho é o tamanho de cada vetor e distância é a forma que o algoritmo vai buscar pelas diferenças.
+
+===
+
+Configurando o OpenAI
+
+Configurar o OpenAI neste contexto, é definir como vão ser processados os chunks e como vão ser processadas as consultas feitas pelo usuário:
+
+import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
+import { config } from "../config.js";
+
+const openApikey = config.openai.apikey;
+
+//Vetorização dos textos
+export const embeddings = new OpenAIEmbeddings({
+  openAIApiKey: openApikey,
+  model: "text-embedding-3-small",
+  maxRetries: 2,
+  timeout: 10000,
+});
+
+//Processamento das mensagens (prompts)
+export const llm = new ChatOpenAI({
+  apiKey: openApikey,
+  model: "gpt-4o-mini",
+  temperature: 0,
+  maxRetries: 2,
+  timeout: 20000,
+});
+
+A configuração é semelhante: é preciso da chave da openai pra uso de suas apis, modelo a ser usado para cada tarefa, número máximo de tentativas e timeout.
+No processamento das mensagens, uma propriedade a mais é configurada: temperature. Em termos simples, ela indica o quanto o modelo deve "imaginar" na hora de inferir algo.
+No contexto de RAG, sempre que possível, usar temperature igual a zero, pra evitar alucinações.
